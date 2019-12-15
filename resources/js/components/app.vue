@@ -11,7 +11,7 @@ import sidemenu from './sidemenu.vue';
 import fabcanvas from './canvas.vue';
 import palette from './palette.vue';
 
-export default {
+export default{
   components: {
     sidemenu,
     fabcanvas,
@@ -20,7 +20,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>>
   
