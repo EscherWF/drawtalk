@@ -19,6 +19,8 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+//Storage path
+const STORAGEpath   = firebase.storage().ref(); 
 //check a user info
 const DBpath        = firebase.database();
 const requesteduser = location.pathname.replace('/','')?
@@ -64,9 +66,22 @@ new Vue({
       objctspath.child(key).set(JSON.stringify(value));
       // console.log(key);
       // console.log(JSON.stringify(value));
-      
-      
     });
+
+    eventHub.$on("imgupload",function(imgdata,filename){
+      // console.log(base64);
+      // console.log(filename);
+      
+      
+      let targetpath  = STORAGEpath.child(filename);
+      let imgURL;
+      targetpath.getDownloadURL().then(function(path){
+        imgURL = path;        
+      });
+      targetpath.putString(imgdata,'data_url').then(function(){
+        eventHub.$emit("sendedimg",imgURL);
+      })
+    })
   }
 })
 
