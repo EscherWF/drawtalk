@@ -21,20 +21,39 @@ firebase.initializeApp(firebaseConfig);
 //check a user info
 const DBpath        = firebase.database();
 const requesteduser = location.pathname.replace('/','')?
-                      location.pathname.replace('/','')
-                      : "not filled parameter";
+                      location.pathname.replace('/',''): "no";
 const userpath      = DBpath.ref(`users/${requesteduser}`);
+const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
+const messagespath  = DBpath.ref(`users/${requesteduser}/messages`);
 
 userpath.once("value",function(snapshot){
   if(snapshot.exists()){
     
   }else{
-    let key = DBpath.ref('users').push({createdAt:"20191215"}).key;
+    let key = DBpath.ref('users').push({
+      objects :{createdAt:"20191215"},
+      messages:{cretedAt:"20191215"}}).key;
     //redirecting page
     location.pathname = `/${key}`;
-    
   }; 
 });
+
+//watch firebase objects Data
+objctspath.on("child_changed",function(snapshot){
+  console.log(snapshot.val());
+})
+objctspath.on("child_added",function(snapshot){
+  console.log(snapshot.val());
+})
+
+//watch firebase messages Data
+messagespath.on("child_changed",function(snapshot){
+  console.log(snapshot.val());
+})
+messagespath.on("child_added",function(snapshot){
+  console.log(snapshot.val());
+})
+
 
 window.Vue = Vue;
 new Vue({
@@ -43,5 +62,4 @@ new Vue({
   template:'<app />'
 })
 
-console.log(firebaseConfig);
 
