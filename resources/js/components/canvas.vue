@@ -11,7 +11,7 @@
 import { fabric } from 'fabric';
 import eventHub from '../eventHub';
 import store from '../store';
-
+//canvas
 let canvas;
 let canvashistory = [];
 let currentindex  = 0;
@@ -23,6 +23,13 @@ export default{
     }
   },
   created(){
+    eventHub.$on('objchanged',function(value,key){ 
+      if(key != "createdAt")
+        this.SocketToCanvas(value,key); 
+    }.bind(this)) 
+
+
+
     eventHub.$on('undobutton',function(){      
         this.UndoCanvas();
     }.bind(this))    
@@ -173,7 +180,7 @@ export default{
         //set id property created uniqueID
         drawingobj.set({
           id:this.CreateUniaueID()
-        });
+        });        
         this.SaveCanvasHistory(drawingobj,'ADD',true);
         this.ArrangeDataForDB(drawingobj,'post');       
       }
@@ -235,22 +242,26 @@ export default{
     },
     PostDataByaxios:function(objects,ope){
 
-      if(ope == 'post'){
-        axios.post('post/element',{
-          params: this.$route.params.pathMatch,
-          target: objects
-        })
-        .then(function(response){
-        })
+      
+      let key = objects[0].uniqueid;
+      let value = objects[0].element;
+      eventHub.$emit("send",value,key);
+      // if(ope == 'post'){
+      //   axios.post('post/element',{
+      //     params: this.$route.params.pathMatch,
+      //     target: objects
+      //   })
+      //   .then(function(response){
+      //   })
 
-      }else if(ope == 'delete'){
-        axios.post('delete/element',{
-          params: this.$route.params.pathMatch,
-          targetid: objects
-        })
-        .then(function(response){
-        })
-      }
+      // }else if(ope == 'delete'){
+      //   axios.post('delete/element',{
+      //     params: this.$route.params.pathMatch,
+      //     targetid: objects
+      //   })
+      //   .then(function(response){
+      //   })
+      // }
     },
     CreateUniaueID:function(myStrong){
       let strong = 1000;
@@ -391,47 +402,29 @@ export default{
       }
       canvashistory.pop();      
     },
-    AddElementToCanvas:function(objects){
+    SocketToCanvas:function(value,key){ 
+       
+      
+      let svindex = -1;
+      // canvas.discardActiveObject();  
+      let castedvalue = JSON.parse(value);
 
-      objects.forEach(function(obj,index){          
-        
-        let prot = JSON.parse(obj.element);  
-        prot.__proto__ = this.GetCanvasKlass(prot.type);      
-        prot.clone(function(elm){
-          elm.set({
-            id: obj.uniqueid
-          });
-          //put objects according to their index
-          //not use canvas.add(...)
-          canvas.insertAt(elm,index,true);
-        })
-        
-      }.bind(this))
-    },
-    SocketToCanvas:function(receivedobj){  
-      console.log(receivedobj);
-          
-      canvas.discardActiveObject();            
-
-      receivedobj.forEach(function(elm){
-        elm.element.__proto__ = this.GetCanvasKlass(elm.element.type);
-        elm.element.clone(function(clone){    
-          clone.set({
-            id: elm.uniqueid
-          });
-
-          let svindex = -1;
-          canvas._objects.forEach(function(obj,index){
-            if(obj.id == elm.uniqueid){
-              canvas.insertAt(clone,index,true);
-              svindex = index;
-            }
-          })
-          if(svindex == -1){
-            canvas.add(clone);
+      castedvalue.__proto__ = this.GetCanvasKlass(castedvalue.type);
+      // value.__proto__ = fabric.Image.prototype;
+      castedvalue.clone(function(clone){    
+        clone.set({id: key});
+        if(canvas._objects.length == 0){
+          canvas.add(clone);
+          return;
+        }
+        canvas._objects.forEach(function(elm,index){
+            if(key == elm.id){
+                canvas.insertAt(clone,index,true);
+            svindex = index;
           }
-        })
-      }.bind(this))   
+        }.bind(this))  
+        if(svindex == -1)canvas.add(clone);
+      });
     },
     DeleteFromCanvas:function(ids){
       canvas.discardActiveObject();

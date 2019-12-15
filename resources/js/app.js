@@ -3,6 +3,7 @@ require('./bootstrap');
 import Vue from 'vue';
 import App from './components/App.vue';
 import firebase from 'firebase';
+import eventHub from './eventHub.js'
 
 // my app's Firebase configuration
 var firebaseConfig = {
@@ -22,44 +23,51 @@ firebase.initializeApp(firebaseConfig);
 const DBpath        = firebase.database();
 const requesteduser = location.pathname.replace('/','')?
                       location.pathname.replace('/',''): "no";
-const userpath      = DBpath.ref(`users/${requesteduser}`);
-const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
+const userpath      = DBpath.ref(`users/${requesteduser}/createdAt`);
 const messagespath  = DBpath.ref(`users/${requesteduser}/messages`);
-
-userpath.once("value",function(snapshot){
-  if(snapshot.exists()){
-    
-  }else{
-    let key = DBpath.ref('users').push({
-      objects :{createdAt:"20191215"},
-      messages:{cretedAt:"20191215"}}).key;
-    //redirecting page
-    location.pathname = `/${key}`;
-  }; 
-});
-
-//watch firebase objects Data
-objctspath.on("child_changed",function(snapshot){
-  console.log(snapshot.val());
-})
-objctspath.on("child_added",function(snapshot){
-  console.log(snapshot.val());
-})
-
-//watch firebase messages Data
-messagespath.on("child_changed",function(snapshot){
-  console.log(snapshot.val());
-})
-messagespath.on("child_added",function(snapshot){
-  console.log(snapshot.val());
-})
+const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
 
 
 window.Vue = Vue;
 new Vue({
   el:'#app',
   components:{App},
-  template:'<app />'
+  template:'<app />',
+  mounted:function(){
+
+    userpath.once("value",function(snapshot){      
+      if(!snapshot.exists()){
+        let key = DBpath.ref('users').push({
+        createdAt:"20191215",
+        objects :{createdAt:'20191215'},
+        messages:{createdAt:'20191215'}}).key;
+        //redirecting page
+        location.pathname = `/${key}`;
+      }; 
+    });
+
+    //watch firebase objects Data 
+    objctspath.on("child_changed",function(snapshot){      
+      eventHub.$emit('objchanged',snapshot.val(),snapshot.key);
+    });
+    objctspath.on("child_added",function(snapshot){
+      eventHub.$emit('objchanged',snapshot.val(),snapshot.key);
+    });
+
+    //watch firebase messages Data
+    messagespath.on("child_added",function(snapshot){
+        // console.log(snapshot.val());
+    })   
+    
+    eventHub.$on("send",function(value,key){
+      // 'users.-Lw8L5feX13cpGuIoEJd.objects.value.canvas.renderAndResetBound'
+      objctspath.child(key).set(JSON.stringify(value));
+      // console.log(key);
+      // console.log(JSON.stringify(value));
+      
+      
+    });
+  }
 })
 
 
