@@ -9,7 +9,7 @@
 
 <script>
 import { fabric } from 'fabric';
-import eventHub from '../eventHub.js';
+import eventHub from '../eventHub';
 import store from '../store';
 
 let canvas;
