@@ -77,43 +77,47 @@ export default{
       this.$el.firstChild.click(); 
 
       this.$el.firstChild.onchange = function(e){
+        
         let reader = new FileReader();
         reader.readAsDataURL(e.target.files[0]);
-
         reader.onload = function(){
-          let scaleX = 1;
-          let scaleY = 1;
-          let widthscale,heightscale;
-          const Regulationwidth  = 300;
-          const Regulationheight = 300;
-
-          new fabric.Image.fromURL(reader.result,function(img){
-            if(img.getOriginalSize().width > Regulationwidth 
-              && img.getOriginalSize().height > Regulationheight){
-                //into appropriately sized objects
-                widthscale = Regulationwidth / img.getOriginalSize().width;
-                heightscale = Regulationheight / img.getOriginalSize().height;
-                scaleX = widthscale < heightscale ? widthscale : heightscale;
-                scaleY = widthscale < heightscale ? widthscale : heightscale;
-              }
-          
-            img.set({
-              left:200,
-              top:200,
-              scaleX:scaleX,
-              scaleY:scaleY,
-              //set id property created uniqueID
-              id:this.CreateUniaueID()
-            })                           
-            canvas.add(img);
-            this.SaveCanvasHistory(img,'ADD',true);
-            this.ArrangeDataForDB(img,'post');            
-          }.bind(this));   
-          // 'pointerbutton' returns state active
-          eventHub.$emit('pointerbutton');              
-        }.bind(this)
-      }.bind(this)
+        eventHub.$emit("imgupload",reader.result,e.target.files[0].name);
+        }
+      }
     }.bind(this))     
+
+    eventHub.$on("sendedimg",function(URL){
+      let scaleX = 1;
+      let scaleY = 1;
+      let widthscale,heightscale;
+      const Regulationwidth  = 300;
+      const Regulationheight = 300;
+
+      new fabric.Image.fromURL(URL,function(img){
+        if(img.getOriginalSize().width > Regulationwidth 
+          && img.getOriginalSize().height > Regulationheight){
+            //into appropriately sized objects
+            widthscale = Regulationwidth / img.getOriginalSize().width;
+            heightscale = Regulationheight / img.getOriginalSize().height;
+            scaleX = widthscale < heightscale ? widthscale : heightscale;
+            scaleY = widthscale < heightscale ? widthscale : heightscale;
+          }
+      
+        img.set({
+          left:200,
+          top:200,
+          scaleX:scaleX,
+          scaleY:scaleY,
+          //set id property created uniqueID
+          id:this.CreateUniaueID()
+        })                           
+        canvas.add(img);
+        this.SaveCanvasHistory(img,'ADD',true);
+        this.ArrangeDataForDB(img,'post');            
+      }.bind(this)); 
+      // 'pointerbutton' returns state active
+      eventHub.$emit('pointerbutton');  
+    }.bind(this))
   },
   mounted(){ 
 
@@ -132,7 +136,7 @@ export default{
         lockUniScaling:true,
         borderColor: 'rgb(0,0,0,0.5)',
         borderOpacityWhenMoving: 0,
-        cornerSize:10,
+        cornerSize:16,
         cornerColor:'rgba(0,0,0,0.5)',
         hasRotatingPoint:false
       })   
