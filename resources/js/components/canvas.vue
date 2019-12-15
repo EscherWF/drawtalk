@@ -199,9 +199,7 @@ export default{
     ArrangeDataForDB:function(targets,ope){
       //
       canvas.discardActiveObject();   
-      let objects = [];
-      console.log(objects);
-      
+      let objects = [];      
 
       if(targets._objects && ope == 'post'){
         targets._objects.forEach(function(element){
