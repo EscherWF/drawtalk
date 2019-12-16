@@ -1,9 +1,4 @@
 <template>
-<transition
-    name="custom-classes-transition"
-    enter-active-class="animated tada"
-    leave-active-class="animated bounceOutRight"
->  
   <div id="palette-wrapper" v-show="activepalette">
     <div id="brushs" v-for="(brush) in brushs" :key="brush.name">
       <div :id="brush.id"
@@ -20,7 +15,6 @@
           @click="setcolor(color)"></div>
     </div>
   </div>
-</transition>
 </template>
 
 <script>
@@ -204,12 +198,12 @@ export default {
 
 <style scoped>
   #palette-wrapper{
+    background: #f8f8f8;
     width:250px;
     position: absolute;
-    z-index: 1;
-    background: #f8f8f8;
+    z-index: 1;    
     left: 90px;
-    top:485px;    
+    top:485px;        
     border-radius: 4%;
     border: solid 1px rgba(143, 143, 143, 0.5);    
     height: 240px;
