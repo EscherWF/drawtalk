@@ -27,7 +27,9 @@ export default{
       if(key != "createdAt")
         this.SocketToCanvas(value,key); 
     }.bind(this)) 
-
+     eventHub.$on('objremoved',function(key){ 
+        this.DeleteFromCanvas(key); 
+    }.bind(this))    
 
 
     eventHub.$on('undobutton',function(){      
@@ -44,7 +46,7 @@ export default{
         textAlign:'center',
       })
       //set id property created uniqueID
-      sticky.set('id',this.CreateUniaueID());
+      sticky.set('id',this.CreateUniqueID());
       canvas.add(sticky);
       this.SaveCanvasHistory(sticky,'ADD',true);
       this.ArrangeDataForDB(sticky,'post');
@@ -109,7 +111,7 @@ export default{
           scaleX:scaleX,
           scaleY:scaleY,
           //set id property created uniqueID
-          id:this.CreateUniaueID()
+          id:this.CreateUniqueID()
         })                           
         canvas.add(img);
         this.SaveCanvasHistory(img,'ADD',true);
@@ -130,14 +132,13 @@ export default{
 
     fabric.Object.prototype
       .set({
-        cornerStyle:'rect',
-        transparentCorners:false,
+        cornerStyle:'circle',
         lockScalingFlip:true,
         lockUniScaling:true,
-        borderColor: 'rgb(0,0,0,0.5)',
+        borderColor: 'rgb(80,210,210)',
         borderOpacityWhenMoving: 0,
-        cornerSize:16,
-        cornerColor:'rgba(0,0,0,0.5)',
+        cornerSize:18,
+        cornerColor:'rgb(80,210,210)',
         hasRotatingPoint:false
       })   
       
@@ -183,7 +184,7 @@ export default{
         let drawingobj = canvas._objects[canvas._objects.length-1];
         //set id property created uniqueID
         drawingobj.set({
-          id:this.CreateUniaueID()
+          id:this.CreateUniqueID()
         });        
         this.SaveCanvasHistory(drawingobj,'ADD',true);
         this.ArrangeDataForDB(drawingobj,'post');       
@@ -218,9 +219,7 @@ export default{
           wkobject.uniqueid = element.id;
           //deep copying
           wkobject.element  = JSON.parse(JSON.stringify(element));
-          objects.push(wkobject);      
-          // console.log(objects);
-                        
+          objects.push(wkobject);                             
         });
         let selection = new fabric.ActiveSelection(
         targets._objects, {canvas: canvas});        
@@ -242,32 +241,15 @@ export default{
         objects.push(targets.id);
       };      
 
-      this.PostDataByaxios(objects,ope);
+      objects.forEach(function(obj){
+        if(ope == "post"){
+         eventHub.$emit("post",obj.element,obj.uniqueid); 
+        }else if(ope == "delete"){
+          eventHub.$emit("delete",obj); 
+        }
+      })
     },
-    PostDataByaxios:function(objects,ope){
-
-      
-      let key = objects[0].uniqueid;
-      let value = objects[0].element;
-      eventHub.$emit("send",value,key);
-      // if(ope == 'post'){
-      //   axios.post('post/element',{
-      //     params: this.$route.params.pathMatch,
-      //     target: objects
-      //   })
-      //   .then(function(response){
-      //   })
-
-      // }else if(ope == 'delete'){
-      //   axios.post('delete/element',{
-      //     params: this.$route.params.pathMatch,
-      //     targetid: objects
-      //   })
-      //   .then(function(response){
-      //   })
-      // }
-    },
-    CreateUniaueID:function(myStrong){
+    CreateUniqueID:function(myStrong){
       let strong = 1000;
       if (myStrong) strong = myStrong;
       return new Date().getTime().toString(16)  + Math.floor(strong*Math.random()).toString(16)      
@@ -410,11 +392,10 @@ export default{
        
       
       let svindex = -1;
-      // canvas.discardActiveObject();  
+      canvas.discardActiveObject();  
       let castedvalue = JSON.parse(value);
 
       castedvalue.__proto__ = this.GetCanvasKlass(castedvalue.type);
-      // value.__proto__ = fabric.Image.prototype;
       castedvalue.clone(function(clone){    
         clone.set({id: key});
         if(canvas._objects.length == 0){
@@ -430,14 +411,12 @@ export default{
         if(svindex == -1)canvas.add(clone);
       });
     },
-    DeleteFromCanvas:function(ids){
+    DeleteFromCanvas:function(id){
       canvas.discardActiveObject();
-      ids.forEach(function(id){
-        canvas._objects.forEach(function(obj){
-          if(obj.id == id){
-            canvas.remove(obj);
-          }
-        })
+      canvas._objects.forEach(function(obj){
+        if(obj.id == id){
+          canvas.remove(obj);
+        }
       })
     },
     GetCanvasKlass:function(type){

@@ -55,31 +55,40 @@ new Vue({
     objctspath.on("child_added",function(snapshot){
       eventHub.$emit('objchanged',snapshot.val(),snapshot.key);
     });
+    objctspath.on("child_removed",function(snapshot){
+      eventHub.$emit('objremoved',snapshot.key);
+    });    
 
     //watch firebase messages Data
     messagespath.on("child_added",function(snapshot){
-        // console.log(snapshot.val());
-    })   
-    
-    eventHub.$on("send",function(value,key){
-      // 'users.-Lw8L5feX13cpGuIoEJd.objects.value.canvas.renderAndResetBound'
-      objctspath.child(key).set(JSON.stringify(value));
-      // console.log(key);
-      // console.log(JSON.stringify(value));
-    });
+        eventHub.$emit('showtalks',snapshot.val(),snapshot.key);
+    })
+    //send message to DB
+    eventHub.$on("sendtalk",function(talkbody){
+      messagespath.push(talkbody);
+    })
 
+    //change or delete
+    eventHub.$on("post",function(value,key){
+      objctspath.child(key).set(JSON.stringify(value));
+    });
+    eventHub.$on("delete",function(key){
+      objctspath.child(key).remove();
+    });    
+
+    //upload images
     eventHub.$on("imgupload",function(imgdata,filename){
-      // console.log(base64);
-      // console.log(filename);
-      
-      
       let targetpath  = STORAGEpath.child(filename);
-      let imgURL;
-      targetpath.getDownloadURL().then(function(path){
-        imgURL = path;        
-      });
-      targetpath.putString(imgdata,'data_url').then(function(){
-        eventHub.$emit("sendedimg",imgURL);
+      let uploadtask = targetpath.putString(imgdata,'data_url');
+      uploadtask.on('state_changed',function(snapshot){
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if(progress == 0){
+            //spiner
+          }else if(progress == 100){
+            targetpath.getDownloadURL().then(function(path){
+              eventHub.$emit("sendedimg",path);
+            });
+          }
       })
     })
   }

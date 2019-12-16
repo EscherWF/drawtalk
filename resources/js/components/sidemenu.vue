@@ -27,8 +27,6 @@ export default{
         height:'10px',
         borderRadius:'50%',
         position:'relative',
-        // right:'10px',
-        // top:'205px',
       },
       modes:[
         {id:'undobutton',
@@ -37,12 +35,6 @@ export default{
          noactivesrc:require('../../img/undo.png'),
          active:false,
          },
-        //  {id:'redobutton',
-        //  name:'やり直す',
-        //  activesrc:require('../../img/redoWH.png'),
-        //  noactivesrc:require('../../img/redo.png'),
-        //  active:false,
-        //  },
          {id:'pointerbutton',
          name:'選択',
          activesrc:require('../../img/handcursorWH.png'),
@@ -80,8 +72,8 @@ export default{
     eventHub.$on('drawbutton',function (brush) {
       if (brush){
         this.pickcolor.background = store.__getcolor();     
-        this.modes[3].activesrc = brush.activesrc;
-        this.modes[3].noactivesrc = brush.noactivesrc; 
+        this.modes[2].activesrc = brush.activesrc;
+        this.modes[2].noactivesrc = brush.noactivesrc; 
       }
     }.bind(this))
     //emit from CanvasComponent
@@ -108,10 +100,6 @@ export default{
         }
     }
   },
-  computed: {
-    
-  },
-
 }
 </script>
 
@@ -122,7 +110,7 @@ export default{
     position: absolute;
     left: 20px;
     top:300px;
-    z-index: 1;
+    z-index: 1;    
     border-radius: 20px;
     border: solid 1px rgba(143, 143, 143, 0.5);
   } img{
