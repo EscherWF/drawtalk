@@ -9,12 +9,18 @@
         <img v-else :src="mode.noactivesrc" alt="">
         <div id="pickcolor" v-if="mode.id == 'drawbutton'" :style="pickcolor"></div>  
       </div>
+      <div v-for="(item,i) in aboutcanvas" :key="i" >
+        <div :id="item.id"
+             :title="item.name"
+             @click="aboutcanvas">
+
+        </div>
+      </div>
     </div> 
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
 import eventHub from '../eventHub.js';
 import store from '../store.js';
 
@@ -23,10 +29,9 @@ export default{
     return {
       pickcolor:{
         background:'black',
-        width:'10px',
-        height:'10px',
-        borderRadius:'50%',
+        height:'5px',
         position:'relative',
+        borderRadius:'0 0 5px 5px'
       },
       modes:[
         {id:'undobutton',
@@ -54,7 +59,7 @@ export default{
          active:false,         
          },
          {id:'stickybutton',
-         name:'付箋',
+         name:'文字',
          activesrc:require('../../img/stickyWH.png'),
          noactivesrc:require('../../img/sticky.png'),
          active:false,         
@@ -65,6 +70,40 @@ export default{
          noactivesrc:require('../../img/image.png'),
          active:false,         
          },
+         {id:'aboutcanvas',
+         name:'キャンバス操作',
+         activesrc:require('../../img/aboutcanvasWH.png'),
+         noactivesrc:require('../../img/aboutcanvas.png'),
+         active:false,         
+         },
+         {id:'chat',
+         name:'チャット',
+         activesrc:require('../../img/chatWH.png'),
+         noactivesrc:require('../../img/chat.png'),
+         active:false,         
+         },                  
+      ],
+      aboutcanvas:[
+        {id:'backgroundcolor',
+         name:'背景色',
+         src:require('../../img/bgcolor.png'),
+         }, 
+        {id:'deleteall',
+         name:'すべて消去',
+         src:require('../../img/deleteall.png'),
+         }, 
+        {id:'newcanvas',
+         name:'キャンバス作成',
+         src:require('../../img/newcanvas.png'),
+         }, 
+        {id:'sharecanvas',
+         name:'キャンバス共有',
+         src:require('../../img/share.png'),
+         }, 
+        {id:'savetoimage',
+         name:'画像保存',
+         src:require('../../img/pngimage.png'),
+         },                                     
       ]
     }
   },
@@ -83,7 +122,10 @@ export default{
   },
   methods: {
     ModeSelect: function(mode){
-      if (mode.id != 'undobutton' && mode.id != 'redobutton'){
+      if (mode.id != 'undobutton'  &&
+          mode.id != 'stickybutton'&& 
+          mode.id != 'chat'        &&
+          mode.id != 'redobutton'){
         for(let ii in this.modes){
           this.modes[ii].active = false;
         }
@@ -105,11 +147,12 @@ export default{
 
 <style scoped>
   #sidemenu-wrapper{
+    user-select: none;
     width:60px;
     background: #f8f8f8;
     position: absolute;
     left: 20px;
-    top:300px;
+    top:10px;
     z-index: 1;    
     border-radius: 20px;
     border: solid 1px rgba(143, 143, 143, 0.5);
@@ -128,7 +171,7 @@ export default{
   }
 
   .active{
-    border-radius: 5%;
+    border-radius: 5px;
     background: #bbbbbb;
   }
 </style>

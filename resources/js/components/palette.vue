@@ -147,7 +147,23 @@ export default {
               {color: 'blanchedalmond',
                activecolor:false},              
               {color: 'bisque',          
-               activecolor:false},                            
+               activecolor:false},      
+              {color: 'papayawhip',
+               activecolor:false},              
+              {color: 'blanchedalmond',
+               activecolor:false},              
+              {color: 'bisque',          
+               activecolor:false},  
+              {color: 'papayawhip',
+               activecolor:false},              
+              {color: 'blanchedalmond',
+               activecolor:false},              
+              {color: 'bisque',          
+               activecolor:false},      
+              {color: 'blanchedalmond',
+               activecolor:false},              
+              {color: 'bisque',          
+               activecolor:false},                                                                   
       ],
     }
   },
@@ -198,15 +214,16 @@ export default {
 
 <style scoped>
   #palette-wrapper{
+    user-select: none;
     background: #f8f8f8;
     width:250px;
     position: absolute;
     z-index: 1;    
     left: 90px;
-    top:485px;        
-    border-radius: 4%;
+    top:10px;        
+    border-radius: 10px;
     border: solid 1px rgba(143, 143, 143, 0.5);    
-    height: 240px;
+    height: 310px;
   }img{
     width:2.5rem;
     margin-left: 4px;
