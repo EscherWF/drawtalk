@@ -1,6 +1,7 @@
 require('./bootstrap');
 
 import Vue from 'vue';
+import VModal from 'vue-js-modal';
 import App from './components/App.vue';
 import firebase from 'firebase';
 import eventHub from './eventHub.js'
@@ -32,12 +33,26 @@ const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
 
 
 window.Vue = Vue;
+Vue.use(VModal);
 
 new Vue({
   el:'#app',
   components:{App},
-  template:'<app />',
-  mounted:function(){
+  template:'<div>\
+              <app />\
+              <modal :click-to-close="false" width="200px" height="200px"\
+                      name="modamoda"\
+                      style="user-select:none;">\
+                      <p>アップロード処理中...</p>\
+                      <p>{{progressnum}}% 完了済</p>\
+                      <div></div>\
+                      </modal>\
+            </div>',
+  data:{
+    progressnum:0,
+    src:"../img/logorotate.gif"
+  },
+  mounted:function(){  
 
     userpath.once("value",function(snapshot){      
       if(!snapshot.exists()){
@@ -82,18 +97,23 @@ new Vue({
     eventHub.$on("imgupload",function(imgdata,filename){
       let targetpath  = STORAGEpath.child(filename);
       let uploadtask = targetpath.putString(imgdata,'data_url');
+      
+      //uploading indicator(show modal)
+      this.$modal.show("modamoda");
+
       uploadtask.on('state_changed',function(snapshot){
         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          if(progress == 0){
-            //spiner
-          }else if(progress == 100){
+          this.progressnum = Math.round(progress);
+          if(progress == 100){
+            this.$modal.hide('modamoda');
             targetpath.getDownloadURL().then(function(path){
               eventHub.$emit("sendedimg",path);
-            });
+            }.bind(this));
           }
-      })
-    })
+      }.bind(this))
+    }.bind(this))
   }
 })
+
 
 
