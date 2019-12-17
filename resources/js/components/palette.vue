@@ -1,6 +1,6 @@
 <template>
   <div id="palette-wrapper" v-show="activepalette">
-    <div id="brushs" v-for="(brush) in brushs" :key="brush.name">
+    <div class="brushs" v-for="(brush) in brushs" :key="brush.name">
       <div :id="brush.id"
           :title="brush.name"
           @click="selectbrush(brush)"
@@ -220,16 +220,16 @@ export default {
     position: absolute;
     z-index: 1;    
     left: 90px;
-    top:10px;        
+    top:80px;        
     border-radius: 10px;
-    border: solid 1px rgba(143, 143, 143, 0.5);    
+    border: solid 1px rgba(80,210,210);    
     height: 310px;
   }img{
     width:2.5rem;
     margin-left: 4px;
   }
 
-   #brushs{
+   .brushs{
     display: inline-block;
     width: 50px;
     margin: 5.5px;

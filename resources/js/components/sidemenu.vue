@@ -9,13 +9,6 @@
         <img v-else :src="mode.noactivesrc" alt="">
         <div id="pickcolor" v-if="mode.id == 'drawbutton'" :style="pickcolor"></div>  
       </div>
-      <div v-for="(item,i) in aboutcanvas" :key="i" >
-        <div :id="item.id"
-             :title="item.name"
-             @click="aboutcanvas">
-
-        </div>
-      </div>
     </div> 
   </div>
 </template>
@@ -83,28 +76,6 @@ export default{
          active:false,         
          },                  
       ],
-      aboutcanvas:[
-        {id:'backgroundcolor',
-         name:'背景色',
-         src:require('../../img/bgcolor.png'),
-         }, 
-        {id:'deleteall',
-         name:'すべて消去',
-         src:require('../../img/deleteall.png'),
-         }, 
-        {id:'newcanvas',
-         name:'キャンバス作成',
-         src:require('../../img/newcanvas.png'),
-         }, 
-        {id:'sharecanvas',
-         name:'キャンバス共有',
-         src:require('../../img/share.png'),
-         }, 
-        {id:'savetoimage',
-         name:'画像保存',
-         src:require('../../img/pngimage.png'),
-         },                                     
-      ]
     }
   },
   created(){
@@ -134,11 +105,16 @@ export default{
       eventHub.$emit(mode.id);
     },
     ChangePaletteState:function(){
-        if(this.$parent.$children[1]._data.activepalette){
-          this.$parent.$children[1]._data.activepalette = false;
-          this.$parent.$children[1]._data.availablepalette = false;
+        if(this.$parent.$children[2]._data.activepalette){
+          this.$parent.$children[2]._data.activepalette = false;
+          this.$parent.$children[2]._data.availablepalette = false;
         }else{
-          this.$parent.$children[1]._data.availablepalette = true;
+          this.$parent.$children[2]._data.availablepalette = true;
+        }
+
+        if(this.$parent.$children[3]._data.aboutcanvasactive){
+          this.$parent.$children[3]._data.aboutcanvasactive = false;
+          if(this.modes[6].active)eventHub.$emit("pointerbutton");
         }
     }
   },
@@ -152,10 +128,10 @@ export default{
     background: #f8f8f8;
     position: absolute;
     left: 20px;
-    top:10px;
+    top:80px;
     z-index: 1;    
     border-radius: 20px;
-    border: solid 1px rgba(143, 143, 143, 0.5);
+    border: solid 1px rgb(80, 210, 210);
   } img{
       width: 2.5rem;
       margin-left: 3px; 
