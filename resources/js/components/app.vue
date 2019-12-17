@@ -31,4 +31,21 @@ export default{
 }
 </script>
 
+<style>
+  .v--modal-box{
+    border: 2px solid rgb(80,210,210);
+    border-radius: 10px;
+  }
+  .v--modal-box>p{
+    text-align: center;
+  }
+  .v--modal-box>div{
+    margin: 0 auto;
+    height: 100px;
+    width: 100px;
+    background-image: url("../../img/logorotate.gif");
+    background-repeat : no-repeat;
+  }
+</style>
+
   
