@@ -66,9 +66,9 @@ export default{
     z-index: 1;
     width:300px;
     position: absolute; 
-    left: 100px;
-    top:400px;   
-    border: 2px solid rgb(80, 210, 210);
+    left: 90px;
+    top: 510px;   
+    border: 1px solid rgb(80, 210, 210);
     cursor: move;
     background: #f8f8f8;
     border-radius: 10px;

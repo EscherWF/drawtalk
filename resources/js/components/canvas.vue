@@ -127,6 +127,29 @@ export default{
         this.ArrangeDataForDB(img,'post');            
       }.bind(this)); 
     }.bind(this))
+
+    eventHub.$on('deleteall',function(){
+      let arrangeobj = {_objects:[]};
+      if(canvas._objects.length){
+         
+          canvas._objects.forEach(function(obj) {
+              if(canvas._objects.length > 1){
+                arrangeobj._objects.push(obj);
+              }else{
+                arrangeobj = obj;
+              }
+              canvas.fxRemove(obj);
+          });   
+        this.SaveCanvasHistory(this.CreateClone(arrangeobj),'REMOVE',true);
+        this.ArrangeDataForDB(arrangeobj,'delete');
+      }
+    }.bind(this))
+
+    eventHub.$on("changeBGcolor",function(){
+      let BGcolor = store.__getBGcolor();
+      canvas.backgroundColor = BGcolor;
+      canvas.renderAll();
+    })
   },
   mounted(){ 
 
@@ -153,24 +176,6 @@ export default{
     canvas.on('mouse:down',function(options){
       if(this.isEraserMode && options.target){
         
-        const createclone = function(objs){
-          let clonearray = [];
-          if(objs._objects){
-            objs._objects.forEach(function(obj){
-              obj.clone(function(clone){
-                clone.set({id:obj.id});
-                clonearray.push(clone);
-              })
-            })
-          }else{
-            objs.clone(function(clone){
-              clone.set({id:objs.id});
-              clonearray.push(clone);
-            })
-          }
-          return clonearray;
-        }
-
         let removeObj = canvas.getActiveObject();       
         if (removeObj.type == 'activeSelection') {
             //multiple selected
@@ -182,7 +187,7 @@ export default{
             canvas.fxRemove(removeObj);
         }
         canvas.discardActiveObject(); 
-        this.SaveCanvasHistory(createclone(removeObj),'REMOVE',true);
+        this.SaveCanvasHistory(this.CreateClone(removeObj),'REMOVE',true);
         this.ArrangeDataForDB(removeObj,'delete');      
       }          
     }.bind(this))
@@ -217,10 +222,29 @@ export default{
         height: this.$el.offsetHeight});
         canvas.renderAll();
     },
-    ClosePalette:function(){      
-      if(this.$parent.$children[1]._data.activepalette){
-        this.$parent.$children[1]._data.activepalette = false;
+    ClosePalette:function(){            
+      if(this.$parent.$children[2]._data.activepalette)
+        this.$parent.$children[2]._data.activepalette = false;
+
+      if(this.$parent.$children[3]._data.aboutcanvasactive)
+        this.$parent.$children[3]._data.aboutcanvasactive = false;        
+    },
+    CreateClone:function(objs){
+      let clonearray = [];
+      if(objs._objects){
+        objs._objects.forEach(function(obj){
+          obj.clone(function(clone){
+            clone.set({id:obj.id});
+            clonearray.push(clone);
+          })
+        })
+      }else{
+        objs.clone(function(clone){
+          clone.set({id:objs.id});
+          clonearray.push(clone);
+        })
       }
+      return clonearray;    
     },
     ArrangeDataForDB:function(targets,ope){
       //
