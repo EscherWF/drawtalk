@@ -20,6 +20,7 @@
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
+        "@branu-jp/v-drag": "^0.1.0",
         "fabric": "^3.5.1",
         "firebase": "^7.6.0",
         "vue": "^2.6.11",

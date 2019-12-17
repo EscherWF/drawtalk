@@ -1,5 +1,5 @@
 <template>
-  <div @mousedown="ClosePalette">
+  <div id="canvas-wrapper" @mousedown="ClosePalette">
     <input type="file" style="display:none"
            accept="image/png, image/jpeg" >
     <canvas id="canvas" >
@@ -39,9 +39,16 @@ export default{
     eventHub.$on('stickybutton', function(){
       canvas.isDrawingMode = false;
       this.isEraserMode = false;
-      let sticky = new fabric.Text('テキストエリア',{
+
+      let user = window.prompt("表示したい文字を入力してください。", "");
+      if(user == "" || user == null) {
+        eventHub.$emit('pointerbutton');
+        return;
+      }
+      
+      let sticky = new fabric.Text(user,{
         left:100,
-        top:100,
+        top:280,
         fontSize:30,
         textAlign:'center',
       })
@@ -50,6 +57,7 @@ export default{
       canvas.add(sticky);
       this.SaveCanvasHistory(sticky,'ADD',true);
       this.ArrangeDataForDB(sticky,'post');
+      eventHub.$emit('pointerbutton');
     }.bind(this)),
 
     eventHub.$on('drawbutton',function (brush) {
@@ -86,6 +94,7 @@ export default{
         eventHub.$emit("imgupload",reader.result,e.target.files[0].name);
         }
       }
+      eventHub.$emit('pointerbutton');
     }.bind(this))     
 
     eventHub.$on("sendedimg",function(URL){
@@ -117,18 +126,17 @@ export default{
         this.SaveCanvasHistory(img,'ADD',true);
         this.ArrangeDataForDB(img,'post');            
       }.bind(this)); 
-      // 'pointerbutton' returns state active
-      eventHub.$emit('pointerbutton');  
     }.bind(this))
   },
   mounted(){ 
 
     canvas = new fabric.Canvas('canvas',{
-      width: 1500,
-      height: 1500,
-      backgroundColor: 'rgb(255,255,255)',
+      backgroundColor: 'white',
       rotationCursor:'grab',
     }) 
+
+    window.addEventListener('resize',this.CanvasResize,false);
+    this.CanvasResize();
 
     fabric.Object.prototype
       .set({
@@ -203,7 +211,13 @@ export default{
             this.SaveCanvasHistory(e.target,'SELECTED',e.e)}.bind(this)});    
   },
   methods: {
-    ClosePalette:function(){
+    CanvasResize:function(){
+      canvas.setDimensions({
+        width : this.$el.offsetWidth,
+        height: this.$el.offsetHeight});
+        canvas.renderAll();
+    },
+    ClosePalette:function(){      
       if(this.$parent.$children[1]._data.activepalette){
         this.$parent.$children[1]._data.activepalette = false;
       }
@@ -430,3 +444,10 @@ export default{
   },
 }
 </script>
+
+<style scoped>
+  #canvas-wrapper{
+    height: 100vh;
+    width:100vw;
+  }
+</style>

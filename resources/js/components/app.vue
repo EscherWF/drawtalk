@@ -7,8 +7,8 @@
   </div> -->
   <sidemenu />
   <palette />
-  <fabcanvas />
   <chat />
+  <fabcanvas />
 </div>
 </template>
 
@@ -29,9 +29,5 @@ export default{
   }
 }
 </script>
-
-<style>
-
-</style>
 
   

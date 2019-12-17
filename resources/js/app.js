@@ -30,7 +30,9 @@ const messagespath  = DBpath.ref(`users/${requesteduser}/messages`);
 const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
 
 
+
 window.Vue = Vue;
+
 new Vue({
   el:'#app',
   components:{App},
