@@ -19,7 +19,8 @@ let currentindex  = 0;
 export default{
   data(){
     return {
-      isEraserMode:false
+      isEraserMode:false,
+      isMouseDown:false,
     }
   },
   created(){
@@ -38,7 +39,7 @@ export default{
 
     eventHub.$on('stickybutton', function(){
       canvas.isDrawingMode = false;
-      this.isEraserMode = false;
+      this.ChangeEraserMode(false);
 
       let user = window.prompt("表示したい文字を入力してください。", "");
       if(user == "" || user == null) {
@@ -62,25 +63,25 @@ export default{
 
     eventHub.$on('drawbutton',function (brush) {
       canvas.isDrawingMode = true;
-      this.isEraserMode = false;
+      this.ChangeEraserMode(false);
       canvas.freeDrawingBrush.width = store.__getbrush();
       canvas.freeDrawingBrush.color = store.__getcolor();
     }.bind(this))
 
     eventHub.$on('eraserbutton',function () {
       canvas.isDrawingMode = false;
-      this.isEraserMode = true;
+      this.ChangeEraserMode(true);
       
     }.bind(this))
 
     eventHub.$on('pointerbutton',function () {
       canvas.isDrawingMode = false;
-      this.isEraserMode = false;
+      this.ChangeEraserMode(false);
     }.bind(this))
 
     eventHub.$on('imagebutton',function () {
       canvas.isDrawingMode = false;
-      this.isEraserMode = false;
+      this.ChangeEraserMode(false);
 
       this.$el.firstChild.value = '';
       //open filespicker 
@@ -173,26 +174,22 @@ export default{
         hasRotatingPoint:false
       })   
       
-    canvas.on('mouse:down',function(options){
-      if(this.isEraserMode && options.target){
-        
-        let removeObj = canvas.getActiveObject();       
-        if (removeObj.type == 'activeSelection') {
-            //multiple selected
-            removeObj.forEachObject(function(obj) {
-                canvas.fxRemove(obj);
-            });            
-        } else {
-            //single selected
-            canvas.fxRemove(removeObj);
-        }
-        canvas.discardActiveObject(); 
-        this.SaveCanvasHistory(this.CreateClone(removeObj),'REMOVE',true);
-        this.ArrangeDataForDB(removeObj,'delete');      
+    canvas.on("mouse:move",function(e){
+      if(this.isEraserMode&&this.isMouseDown&&e.target){
+        canvas.remove(e.target);
+        this.SaveCanvasHistory(this.CreateClone(e.target),'REMOVE',true);
+        this.ArrangeDataForDB(e.target,'delete');
+      }
+    }.bind(this))
+
+    canvas.on('mouse:down',function(options){      
+      if(this.isEraserMode){
+        this.isMouseDown = true;     
       }          
     }.bind(this))
 
     canvas.on('mouse:up',function(events){
+      if(this.isEraserMode&&this.isMouseDown)this.isMouseDown =false;
       if(canvas.isDrawingMode){
         let drawingobj = canvas._objects[canvas._objects.length-1];
         //set id property created uniqueID
@@ -216,6 +213,25 @@ export default{
             this.SaveCanvasHistory(e.target,'SELECTED',e.e)}.bind(this)});    
   },
   methods: {
+    ChangeEraserMode:function(bool){
+      if(bool){
+        this.isEraserMode = true;
+        canvas.discardActiveObject();
+        canvas.renderAll();
+        canvas.hoverCursor = 'allow';
+        canvas.selection = false;
+        canvas.forEachObject(function(object){ 
+          object.selectable = false; 
+        });
+      }else{
+        this.isEraserMode = false;
+        canvas.hoverCursor = 'move';
+        canvas.selection = true;
+        canvas.forEachObject(function(object){ 
+          object.selectable = true; 
+        });        
+      }
+    },
     CanvasResize:function(){
       canvas.setDimensions({
         width : this.$el.offsetWidth,
@@ -226,8 +242,10 @@ export default{
       if(this.$parent.$children[2]._data.activepalette)
         this.$parent.$children[2]._data.activepalette = false;
 
-      if(this.$parent.$children[3]._data.aboutcanvasactive)
-        this.$parent.$children[3]._data.aboutcanvasactive = false;        
+      if(this.$parent.$children[3]._data.aboutcanvasactive){
+        this.$parent.$children[3]._data.aboutcanvasactive = false; 
+        eventHub.$emit("pointerbutton");       
+      }
     },
     CreateClone:function(objs){
       let clonearray = [];
@@ -389,9 +407,7 @@ export default{
           }) 
           if(target.objects.length == 1){
             this.ArrangeDataForDB(target.objects[0],'post');
-          }else{           
-            console.log(svarray);
-             
+          }else{                        
             this.ArrangeDataForDB(svarray,'post');
           }
           canvas.discardActiveObject();    

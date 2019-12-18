@@ -2,6 +2,8 @@ require('./bootstrap');
 
 import Vue from 'vue';
 import VModal from 'vue-js-modal';
+import QrcodeVue from 'qrcode.vue'
+import VueClipboard from 'vue-clipboard2';
 import App from './components/App.vue';
 import firebase from 'firebase';
 import eventHub from './eventHub.js'
@@ -34,26 +36,44 @@ const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
 
 window.Vue = Vue;
 Vue.use(VModal);
+Vue.use(VueClipboard);
 
 new Vue({
   el:'#app',
-  components:{App},
+  components:{
+    App,
+    QrcodeVue
+  },
   template:'<div>\
               <app />\
               <modal :click-to-close="false" width="200px" height="200px"\
-                      name="modamoda"\
+                      name="uploading"\
                       style="user-select:none;">\
-                      <p>アップロード処理中...</p>\
-                      <p>{{progressnum}}% 完了済</p>\
-                      <div></div>\
-                      </modal>\
+                <p>アップロード処理中...</p>\
+                <p>{{progressnum}}% 完了済</p>\
+                <div id="rotatelogo"></div>\
+              </modal>\
+              <modal name="sharecanvas" width="420px" height="350px">\
+                <p id="canvassharetitle">キャンバスを共有する</p>\
+                <div id="copytoclipboard" @click="saveclipboard">クリップボードへコピー</div>\
+                <p id="canvasURL">キャンバスURL</p>\
+                <input id="showcanvasURL" readonly="readonly" :value="canvasURL">\
+                <p id="canvasURLQR">QRコード</p>\
+                <qrcode-vue id="QRcode" size=150 :value="canvasURL" ></qrcode-vue>\
+              </modal>\
             </div>',
   data:{
     progressnum:0,
-    src:"../img/logorotate.gif"
+    canvasURL:"",
+  },
+  methods:{
+    saveclipboard:function(){
+      this.$copyText(this.canvasURL).then(function(e){
+        console.log("copied!");
+      })
+    }
   },
   mounted:function(){  
-
     userpath.once("value",function(snapshot){      
       if(!snapshot.exists()){
         let key = DBpath.ref('users').push({
@@ -99,18 +119,23 @@ new Vue({
       let uploadtask = targetpath.putString(imgdata,'data_url');
       
       //uploading indicator(show modal)
-      this.$modal.show("modamoda");
+      this.$modal.show("uploading");
 
       uploadtask.on('state_changed',function(snapshot){
         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           this.progressnum = Math.round(progress);
           if(progress == 100){
-            this.$modal.hide('modamoda');
+            this.$modal.hide('uploading');
             targetpath.getDownloadURL().then(function(path){
               eventHub.$emit("sendedimg",path);
             }.bind(this));
           }
       }.bind(this))
+    }.bind(this))
+
+    eventHub.$on("sharecanvas",function(){
+      this.canvasURL = location.href;
+      this.$modal.show("sharecanvas");
     }.bind(this))
   }
 })
