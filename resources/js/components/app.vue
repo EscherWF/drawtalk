@@ -39,12 +39,56 @@ export default{
   .v--modal-box>p{
     text-align: center;
   }
-  .v--modal-box>div{
+  #rotatelogo{
     margin: 0 auto;
     height: 100px;
     width: 100px;
     background-image: url("../../img/logorotate.gif");
     background-repeat : no-repeat;
+  }
+  #canvassharetitle{
+    font-size: 1.6rem;
+    height: 20px;
+    margin: 20px;
+  }
+  #canvasURL{
+    text-align: left;
+    font-size: 1.6rem;
+    color: rgb(80,210,210);
+  }
+  #copytoclipboard{
+    position: absolute;
+    right: 5px;
+    width: 180px;
+    height: 30px;
+    line-height: 30px;
+    top: 70px;
+    border:1px solid rgb(80,210,210);
+    border-radius: 5px;
+  }
+  #copytoclipboard:hover{
+    background: rgb(80,210,210);
+    cursor: pointer;
+  }
+  #canvasURLQR{
+    text-align: left;
+    font-size: 1.6rem;
+    color: rgb(80,210,210);
+    margin-top:60px; 
+  }  
+  #showcanvasURL{
+    font-size: 1.2rem;
+    width:98%;
+    height:25px;
+    position: absolute; 
+    top:110px;
+    border: 1px solid rgb(80,210,210);
+    border-radius: 5px;
+  }
+  #QRcode{
+    position: absolute;
+    right: 100px;
+    top:170px;
   }
 </style>
 

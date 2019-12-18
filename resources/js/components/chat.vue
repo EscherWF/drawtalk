@@ -85,7 +85,7 @@ export default{
     line-height: 30px;
     padding-left: 10px;
     background: rgba(80, 206, 206, 0.5);
-    border:2px solid white;
+    margin: 2px;
     border-radius: 10px;
   }
 
@@ -98,6 +98,7 @@ export default{
   .send-button{
     background: rgb(80, 210, 210);
     border: 1px solid black;
+    border-radius: 5px;
     width: 20%;
     height: 28px;
     position: absolute;
@@ -105,10 +106,11 @@ export default{
     right: 10px;
   }
   .inputtext{
-    width: 70%;
-    height: 20px;
+    width: 72%;
+    height: 24px;
     resize: none;
     margin: 2px;
+    font-size: 1.3rem;
   } 
 </style>
 

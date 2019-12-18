@@ -6,7 +6,6 @@
          @click="eachaction(item.id)">
       <img :src="item.src">
     </div>
-    <!-- <div></div> -->
   </div>
 </div>
 </template>
@@ -63,7 +62,9 @@ export default{
           window.open(location.origin);
           break;
 
-        case 'sharecanvas':break;        
+        case 'sharecanvas':
+          eventHub.$emit("sharecanvas");
+          break;        
       }
       this.aboutcanvasactive = false;
       eventHub.$emit('pointerbutton');
@@ -80,7 +81,7 @@ export default{
     position: absolute;
     left: 90px;
     top: 450px;
-    z-index: 1;   
+    z-index: 1;       
     height: 55px; 
     border-radius: 10px;
     border: solid 1px rgb(80, 210, 210);
