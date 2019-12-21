@@ -42,9 +42,12 @@ export default{
   #rotatelogo{
     margin: 0 auto;
     height: 100px;
-    width: 100px;
-    background-image: url("../../img/logorotate.gif");
-    background-repeat : no-repeat;
+    width: 180px;
+    background-size: contain;
+    background-image: url("../../img/imageuploding.gif");
+    background-repeat: no-repeat;
+    /* background-position: center; */
+
   }
   #canvassharetitle{
     font-size: 1.6rem;
