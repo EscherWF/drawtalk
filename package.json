@@ -10,11 +10,11 @@
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "devDependencies": {
-        "axios": "^0.19",
+        "axios": "^0.21.1",
         "cross-env": "^5.1",
-        "laravel-mix": "^4.0.7",
+        "laravel-mix": "^6.0.25",
         "lodash": "^4.17.13",
-        "resolve-url-loader": "^2.3.1",
+        "resolve-url-loader": "^4.0.0",
         "sass": "^1.15.2",
         "sass-loader": "^7.1.0",
         "vue-template-compiler": "^2.6.11"
@@ -22,7 +22,7 @@
     "dependencies": {
         "@branu-jp/v-drag": "^0.1.0",
         "fabric": "^3.5.1",
-        "firebase": "^7.6.0",
+        "firebase": "^8.7.0",
         "qrcode.vue": "^1.7.0",
         "vue": "^2.6.11",
         "vue-clipboard2": "^0.3.1",
