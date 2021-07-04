@@ -1,10 +1,11 @@
 # draw-talk
 
+![logo](src/img/drawtalk_logo.png)
 
-### WEBサーバー
+https://draw-talk.web.app/
+## 概要
 
-PHPのビルトインサーバーを使用
-```
-$ cd /path_to_project/drawtalk/resources
-$ php -S localhost:8000
-```
+複数人で作業可能なリアルタイムペイントアプリ
+
+![sample](sample.gif)
+
