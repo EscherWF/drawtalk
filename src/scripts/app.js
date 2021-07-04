@@ -1,11 +1,12 @@
-require('./bootstrap');
-
+import firebase from 'firebase/app';
+import 'firebase/storage';
+import 'firebase/database';
 import Vue from 'vue';
 import VModal from 'vue-js-modal';
 import QrcodeVue from 'qrcode.vue'
 import VueClipboard from 'vue-clipboard2';
-import App from './components/App.vue';
-import firebase from 'firebase';
+
+import App from './components/app.vue';
 import eventHub from './eventHub.js'
 
 // my app's Firebase configuration
@@ -23,15 +24,15 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 //Storage path
-const STORAGEpath   = firebase.storage().ref(); 
+const STORAGEpath   = firebase.storage().ref();
 //check a user info
 const DBpath        = firebase.database();
-const requesteduser = location.pathname.replace('/','')?
-                      location.pathname.replace('/',''): "no";
+const requesteduser = location.pathname.replace('/','') ?
+                      location.pathname.replace('/','') : "no";
+
 const userpath      = DBpath.ref(`users/${requesteduser}/createdAt`);
 const messagespath  = DBpath.ref(`users/${requesteduser}/messages`);
 const objctspath    = DBpath.ref(`users/${requesteduser}/objects`);
-
 
 
 window.Vue = Vue;
@@ -39,9 +40,8 @@ Vue.use(VModal);
 Vue.use(VueClipboard);
 
 new Vue({
-  el:'#app',
-  components:{
-    App,
+  render: h => h(App),
+  components: {
     QrcodeVue
   },
   template:'<div>\
@@ -73,20 +73,24 @@ new Vue({
       })
     }
   },
-  mounted:function(){  
-    userpath.once("value",function(snapshot){      
+  mounted:function(){
+    userpath.once("value", function (snapshot) {
       if(!snapshot.exists()){
         let key = DBpath.ref('users').push({
         createdAt:"20191215",
         objects :{createdAt:'20191215'},
         messages:{createdAt:'20191215'}}).key;
+
         //redirecting page
-        location.pathname = `/${key}`;
-      }; 
+        const origin = location.origin;
+        const newId = `${key}`;
+        const redirectUrl = `${origin}/${newId}`;
+        location.href = redirectUrl;
+      };
     });
 
-    //watch firebase objects Data 
-    objctspath.on("child_changed",function(snapshot){      
+    //watch firebase objects Data
+    objctspath.on("child_changed",function(snapshot){
       eventHub.$emit('objchanged',snapshot.val(),snapshot.key);
     });
     objctspath.on("child_added",function(snapshot){
@@ -94,7 +98,7 @@ new Vue({
     });
     objctspath.on("child_removed",function(snapshot){
       eventHub.$emit('objremoved',snapshot.key);
-    });    
+    });
 
     //watch firebase messages Data
     messagespath.on("child_added",function(snapshot){
@@ -111,13 +115,13 @@ new Vue({
     });
     eventHub.$on("delete",function(key){
       objctspath.child(key).remove();
-    });    
+    });
 
     //upload images
     eventHub.$on("imgupload",function(imgdata,filename){
       let targetpath  = STORAGEpath.child(filename);
       let uploadtask = targetpath.putString(imgdata,'data_url');
-      
+
       //uploading indicator(show modal)
       this.$modal.show("uploading");
 
@@ -138,7 +142,7 @@ new Vue({
       this.$modal.show("sharecanvas");
     }.bind(this))
   }
-})
+}).$mount('#app')
 
 
 

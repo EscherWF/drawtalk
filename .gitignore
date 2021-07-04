@@ -1,1 +1,5 @@
-/node_modules
+dist
+httpdocs
+node_modules
+public
+.env
